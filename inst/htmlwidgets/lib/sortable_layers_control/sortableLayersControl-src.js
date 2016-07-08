@@ -66,7 +66,7 @@ Sortable.create(layerList, {
 
 function sortLayers(layArr) {
   for (var i = 0; i < layArr.length; i++) {
-  	map.getPane(layArr[i]).style.zIndex = 400 - i;
+  	map._getMapPanePos(layArr[i]).style.zIndex = 400 - i;
   }
 }
 
