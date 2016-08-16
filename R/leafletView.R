@@ -30,11 +30,12 @@ leafletRL <- function(x,
                 quietly = TRUE, USE.NAMES = FALSE)
 
   is.fact <- raster::is.factor(x)
-  ext <- raster::extent(raster::projectExtent(x, crs = llcrs))
+  # ext <- raster::extent(raster::projectExtent(x, crs = llcrs))
 
   m <- initMap(map, map.types, sp::proj4string(x))
   x <- rasterCheckSize(x, maxpixels = maxpixels)
   x <- rasterCheckAdjustProjection(x)
+  ext <- raster::extent(raster::projectExtent(x, crs = llcrs))
 
   if (!is.na(raster::projection(x)) & trim) x <- trim(x)
 
@@ -58,27 +59,28 @@ leafletRL <- function(x,
     pal <- leaflet::colorFactor(palette = col.regions,
                                 domain = values,
                                 na.color = na.color)
-    pal2 <- pal
+    # pal2 <- pal
   } else {
     pal <- rasterColors(col.regions,
-                         at = at,
-                         na.color = na.color)
+                        at = at,
+                        na.color = na.color)
 
-    if (length(at) > 11) {
-      pal2 <- leaflet::colorNumeric(palette = col.regions,
-                                    domain = at,
-                                    na.color = na.color)
-    } else {
-      pal2 <- leaflet::colorBin(palette = col.regions,
-                                bins = length(at),
-                                domain = at,
-                                na.color = na.color)
-    }
+    # if (length(at) > 11) {
+    #   pal2 <- leaflet::colorNumeric(palette = col.regions,
+    #                                 domain = at,
+    #                                 na.color = na.color)
+    # } else {
+    #   pal2 <- leaflet::colorBin(palette = col.regions,
+    #                             bins = length(at),
+    #                             domain = at,
+    #                             na.color = na.color)
+    # }
 
   }
 
   if (use.layer.names) {
     grp <- names(x)
+    layer.name <- names(x)
   } else {
     grp <- layer.name
   }
@@ -94,11 +96,18 @@ leafletRL <- function(x,
 
   if (legend) {
     ## add legend
-    m <- leaflet::addLegend(map = m,
-                            pal = pal2,
-                            opacity = legend.opacity,
-                            values = at,
-                            title = grp)
+    # m <- leaflet::addLegend(map = m,
+    #                         pal = pal2,
+    #                         opacity = legend.opacity,
+    #                         values = at,
+    #                         title = grp)
+
+    m <- addRasterLegend(x = x,
+                         map = m,
+                         title = grp,
+                         at = at,
+                         col.regions = col.regions,
+                         na.color = na.color)
   }
 
   m <- mapViewLayersControl(map = m,
@@ -125,12 +134,14 @@ leafletRSB <- function(x,
                        col.regions,
                        at,
                        na.color,
+                       use.layer.names,
                        values,
                        map.types,
                        legend,
                        legend.opacity,
                        trim,
                        verbose,
+                       layer.name,
                        ...) {
 
   pkgs <- c("leaflet", "raster", "magrittr")
@@ -141,15 +152,40 @@ leafletRSB <- function(x,
 
   if (nlayers(x) == 1) {
     x <- raster(x, layer = 1)
-    m <- mapView(x, map = m, maxpixels = maxpixels, map.types = map.types,
-                 use.layer.names = TRUE, at = at, col.regions, ...)
+    m <- mapView(x,
+                 map = m,
+                 maxpixels = maxpixels,
+                 map.types = map.types,
+                 use.layer.names = use.layer.names,
+                 at = at,
+                 col.regions = col.regions,
+                 na.color = na.color,
+                 legend = legend,
+                 layer.name = layer.name,
+                 ...)
     out <- new('mapview', object = list(x), map = m@map)
   } else {
-    m <- mapView(x[[1]], map = m, maxpixels = maxpixels, map.types = map.types,
-                 use.layer.names = TRUE, at = at, col.regions, ...)
+    m <- mapView(x[[1]],
+                 map = m,
+                 maxpixels = maxpixels,
+                 map.types = map.types,
+                 use.layer.names = use.layer.names,
+                 at = at,
+                 col.regions = col.regions,
+                 na.color = na.color,
+                 legend = legend,
+                 ...)
     for (i in 2:nlayers(x)) {
-      m <- mapView(x[[i]], map = m@map, maxpixels = maxpixels, map.types = map.types,
-                   use.layer.names = TRUE, at = at, col.regions, ...)
+      m <- mapView(x[[i]],
+                   map = m@map,
+                   maxpixels = maxpixels,
+                   map.types = map.types,
+                   use.layer.names = use.layer.names,
+                   at = at,
+                   col.regions = col.regions,
+                   na.color = na.color,
+                   legend = legend,
+                   ...)
     }
 
     if (length(getLayerNamesFromMap(m@map)) > 1) {
@@ -169,6 +205,7 @@ leafletRSB <- function(x,
 
 leafletPixelsDF <- function(x,
                             zcol,
+                            na.color,
                             ...) {
 
   pkgs <- c("leaflet", "sp", "magrittr")
@@ -183,7 +220,10 @@ leafletPixelsDF <- function(x,
     return(r)
   }))
 
-  m <- mapView(stck, ...)
+  m <- mapView(stck,
+               na.color = na.color,
+               use.layer.names = TRUE,
+               ...)
 
   out <- new('mapview', object = list(x), map = m@map)
 
@@ -274,21 +314,22 @@ leafletPointsDF <- function(x,
     )
   }
 
+  m <- initMap(map, map.types, sp::proj4string(x))
   x <- spCheckAdjustProjection(x)
+
   if (length(x) > 1) {
     ext <- raster::extent(raster::projectExtent(x, crs = llcrs))
   } else {
     ext <- extent(xmin(x) - 0.05, xmax(x) + 0.05,
                   ymin(x) - 0.05, ymax(x) + 0.05)
   }
-  m <- initMap(map, map.types, sp::proj4string(x))
 
   if (burst) {
 
     row_nms <- row.names(x)
 
     leafletList(x,
-                map = map,
+                map = m,
                 map.types = map.types,
                 zcol = zcol,
                 usr_burst = usr_burst,
@@ -492,16 +533,17 @@ leafletPolygonsDF <- function(x,
     burst <- TRUE
   }
 
-  x <- spCheckAdjustProjection(x)
-  ext <- raster::extent(raster::projectExtent(x, crs = llcrs))
   m <- initMap(map, map.types, sp::proj4string(x))
+  x <- spCheckAdjustProjection(x)
+
+  ext <- raster::extent(raster::projectExtent(x, crs = llcrs))
 
   if (burst) {
 
     row_nms <- row.names(x)
 
     leafletList(x,
-                map = map,
+                map = m,
                 map.types = map.types,
                 zcol = zcol,
                 usr_burst = usr_burst,
@@ -592,9 +634,9 @@ leafletPolygons <- function(x,
   tst <- sapply(pkgs, "requireNamespace",
                 quietly = TRUE, USE.NAMES = FALSE)
 
+  m <- initMap(map, map.types, sp::proj4string(x))
   x <- spCheckAdjustProjection(x)
   ext <- raster::extent(raster::projectExtent(x, crs = llcrs))
-  m <- initMap(map, map.types, sp::proj4string(x))
 
   grp <- layer.name
   if (missing(label)) label <- makeLabels(row.names(x))
@@ -696,16 +738,16 @@ leafletLinesDF <- function(x,
     )
   }
 
+  m <- initMap(map, map.types, sp::proj4string(x))
   x <- spCheckAdjustProjection(x)
   ext <- raster::extent(raster::projectExtent(x, crs = llcrs))
-  m <- initMap(map, map.types, sp::proj4string(x))
 
   if (burst) {
 
     row_nms <- row.names(x)
 
     leafletList(x,
-                map = map,
+                map = m,
                 map.types = map.types,
                 zcol = zcol,
                 usr_burst = usr_burst,
@@ -873,9 +915,9 @@ leafletLines <- function(x,
 
   #llcrs <- CRS("+init=epsg:4326")@projargs
 
+  m <- initMap(map, map.types, sp::proj4string(x))
   x <- spCheckAdjustProjection(x)
   ext <- raster::extent(raster::projectExtent(x, crs = llcrs))
-  m <- initMap(map, map.types, sp::proj4string(x))
 
   grp <- layer.name
   if (missing(label)) label <- makeLabels(row.names(x))
@@ -1007,15 +1049,16 @@ leafletList <- function(x,
 
   if(bbr) {
 
-    map <- initBaseMaps(map.types = map.types)
+    #map <- initBaseMaps(map.types = map.types)
+    #map <- initMap(map, map.types, sp::proj4string(x))
 
     if (legend) {
-      map <- createLegend(x,
-                          map = map,
-                          zcol = zcol,
-                          at = at,
-                          col.regions = col.regions,
-                          na.color = na.color)
+      map <- addVectorLegend(x,
+                             map = map,
+                             zcol = zcol,
+                             at = at,
+                             col.regions = col.regions,
+                             na.color = na.color)
     }
 
     x@data[, zcol] <- as.factor(x@data[, zcol])
@@ -1068,19 +1111,20 @@ leafletList <- function(x,
       layer.name <- paste(layer.name, names(x))
     }
 
-    map <- initBaseMaps(map.types = map.types)
+    #map <- initBaseMaps(map.types = map.types)
+    #map <- initMap(map, map.types, sp::proj4string(x))
 
     m <- Reduce("+", lapply(seq(lst), function(i) {
       ind <- which(row.nms %in% row.names(lst[[i]]))
       pop <- popup[ind]
 
       if (legend) {
-        map <- createLegend(lst[[i]],
-                            map = map,
-                            zcol = zcol[i],
-                            at = at,
-                            col.regions = col.regions,
-                            na.color = na.color)
+        map <- addVectorLegend(lst[[i]],
+                               map = map,
+                               zcol = zcol[i],
+                               at = at,
+                               col.regions = col.regions,
+                               na.color = na.color)
       }
 
       mapView(x = lst[[i]],

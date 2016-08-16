@@ -10,7 +10,7 @@ sortableLayersControlDependencies <- function() {
       "sortableLayersControl",
       '0.0.1',
       system.file("htmlwidgets/lib/sortable_layers_control", package = "mapview"),
-      script = c("sortableLayersControl.js"),
+      script = c("sortableLayersControl.js", "sortableLayersControl-src.js"),
       stylesheet = 'sortableLayersControl.css'
     )
   )
@@ -51,9 +51,7 @@ sortableLayersControl <- function(map, layer.names) {
     "</ul></div>")
 
   map$dependencies <- c(map$dependencies, sortableLayersControlDependencies())
-  invokeMethod(map, leaflet::getMapData(map), 'sortableLayersControl',
-               inner_html)
+  leaflet::invokeMethod(map, leaflet:::getMapData(map), 'sortableLayersControl',
+                        inner_html)
 
 }
-
-

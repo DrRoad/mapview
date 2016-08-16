@@ -17,7 +17,7 @@ L.controlSort = function(options) {
 
 L.controlSort().addTo(this);
 
-var map = this;
+//var map = this;
 
 layerList = document.getElementById('layer_list');
 
@@ -56,10 +56,8 @@ $( "input" ).change(function( event ) {
     }
     else{
        map.addLayer(layerClicked);
-    } ;
+    }
  });
 
 
 };
-
-

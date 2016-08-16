@@ -3,14 +3,17 @@ mapview (upcoming)
 
 TO DO:
 
-* add function to addOptions()
 * add option to select whether to view large rasters on map or plain
-* add decorateMap() to add things like scale bar, mouse coordinates, zoom-to-layer buttons etc
-* add removeMouseCoordinates() and removeHomeButton()
-* remove lat lon in popups for polygons as we now have mousecoordinates
 
 new features:
-  * addHomeButton: add zoom-to-layer buttons to a map
+  * garnishMap: function to add multiple decoration elements, such as leaflet::addLayersControl or addHomeButton to a map.
+  * addHomeButton: add zoom-to-layer buttons to a map.
+
+bugfixes:
+  * na.color was not respected for Raster* and SpatialPiXelsDF.
+  * removed lat and lon entries in popupTable for polygons as we now have mousecoordinates.
+  * for raster objects the legend did not respect the intervals specified by 'at'.
+  * mapview working again for objects with no projection (NA).
 
 mapview 1.1.0
 --------------------------------------------------------------------------------

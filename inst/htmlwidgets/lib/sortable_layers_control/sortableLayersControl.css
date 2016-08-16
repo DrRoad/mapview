@@ -1,4 +1,4 @@
-/*
+
 
 html,
 body,
@@ -123,13 +123,13 @@ ul {
 }
 
 .sortableContainer {
-  max-height: 500px;
+  max-height: 350px;
   width: 100%;
   overflow: auto;
 }
 
 .block__list {
-  //padding: 2px 2px 2px 2px;
+  padding: 2px 2px 2px 2px;
   max-width: 300px;
   margin-top: 0px;
   margin-left: 0px;
@@ -162,6 +162,6 @@ ul {
   background-color: #BEBEBE;
 }
 
-//.block__list_words li:first-letter {
-//  text-transform: uppercase;
-//}
+.block__list_words li:first-letter {
+  text-transform: uppercase;
+}

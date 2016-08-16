@@ -9,25 +9,9 @@ leafletEasyButtonDependencies <- function() {
     ))
 }
 
-#
-# # ' Add full screen control to map
-# # '
-# # ' Add full screen control (https://github.com/brunob/leaflet.fullscreen)
-# # ' @param map the map to add the tile layer to
-# # ' @return modified map object
-# # '
-# # ' @examples
-# # ' leaflet() %>%
-# # '   addControlFullScreen()
-# # ' @export
-# addEasyButton <- function(
-#   map
-# ) {
-#   map$dependencies <- c(map$dependencies, leafletFullScreenDependencies())
-#   invokeMethod(map, leaflet::getMapData(map), 'addControlFullScreen')
-# }
 
-addHomeButton <- function(map, ext, layer.name) {
+
+addHomeButton <- function(map, ext, layer.name = "layer") {
 
   if (class(extent) == "matrix") ext <- raster::extent(ext)
   label <- paste("Zoom to", layer.name)
@@ -42,8 +26,8 @@ addHomeButton <- function(map, ext, layer.name) {
   # icon = txt
 
   map$dependencies <- c(map$dependencies, leafletEasyButtonDependencies())
-  invokeMethod(map, leaflet::getMapData(map), 'addHomeButton',
-               ext@xmin, ext@ymin, ext@xmax, ext@ymax, label, txt)
+  leaflet::invokeMethod(map, leaflet:::getMapData(map), 'addHomeButton',
+                        ext@xmin, ext@ymin, ext@xmax, ext@ymax, label, txt)
 
 }
 
@@ -57,6 +41,6 @@ addHomeButton <- function(map, ext, layer.name) {
 
 
 removeHomeButton <- function(map) {
-  invokeMethod(map, NULL, 'removeHomeButton')
+  leaflet::invokeMethod(map, NULL, 'removeHomeButton')
 }
 
