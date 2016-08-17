@@ -10,7 +10,7 @@ sortableLayersControlDependencies <- function() {
       "sortableLayersControl",
       '0.0.1',
       system.file("htmlwidgets/lib/sortable_layers_control", package = "mapview"),
-      script = c("sortableLayersControl.js", "sortableLayersControl-src.js"),
+      script = "sortableLayersControl.js",
       stylesheet = 'sortableLayersControl.css'
     )
   )
@@ -37,21 +37,7 @@ sortableLayersControlDependencies <- function() {
 
 sortableLayersControl <- function(map, layer.names) {
 
-  li <- do.call(paste0, lapply(seq(layer.names), function(i) {
-    paste(
-      "<li id=", layer.names[[i]],
-      "><input type='checkbox' checked>",
-      layer.names[[i]], "</li>", sep = "")
-  }))
-
-  inner_html <- paste(
-    "<div class='layer block'><div class='layer title'><strong>Layers</strong>",
-    "</div><ul id='layer_list' class='block__list block__list_words'>",
-    li,
-    "</ul></div>")
-
   map$dependencies <- c(map$dependencies, sortableLayersControlDependencies())
-  leaflet::invokeMethod(map, leaflet:::getMapData(map), 'sortableLayersControl',
-                        inner_html)
+  leaflet::invokeMethod(map, leaflet:::getMapData(map), 'sortableLayersControl')
 
 }
