@@ -16,7 +16,7 @@ sortableLayersControlDependencies <- function() {
   )
 }
 
-sortableLayersControlDependencies <- function() {
+sortableLayersControlDependencies2 <- function() {
   list(
     htmltools::htmlDependency(
       "Sortable",
@@ -63,7 +63,7 @@ sortableLayersControl <- function(map, layer.names) {
 
 sortableLayersControl2 <- function(map, layer.names) {
 
-  map$dependencies <- c(map$dependencies, sortableLayersControlDependencies())
+  map$dependencies <- c(map$dependencies, sortableLayersControlDependencies2())
   leaflet::invokeMethod(map, leaflet:::getMapData(map), 'sortableLayersControl2')
 
 }

@@ -62,15 +62,24 @@ LeafletWidget.methods.sortableLayersControl2 = function () {
     //   currently bottom layer in layer control will be placed on top
     //   to change just remove reverse below
 
-
+    var zIndex = 400;
     //build from last to first so reverse
-    layers.toArray().reverse().map(function(layer){
+    layers.toArray().reverse().map(function(layer, i){
       var els = $(getElements(layer));
-      var svg = els.parent();
-      //remove the elements
-      els.detach();
-      //add them back to beginning of parent svg
-      svg.prepend(els);
+      var parel = els.parent();
+
+      if(parel.prop("tagName") === "svg") {
+        //remove the elements
+        els.detach();
+        //add them back to beginning of parent svg
+        parel.prepend(els);
+
+        parel.parent().css("zIndex",zIndex);
+      } else {
+        parel.css("zIndex",zIndex);
+      }
+
+      zIndex = zIndex + 1;
     });
   }
 
