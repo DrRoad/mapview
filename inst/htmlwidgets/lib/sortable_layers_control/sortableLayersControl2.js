@@ -6,7 +6,7 @@ LeafletWidget.methods.sortableLayersControl2 = function () {
 
   sortLayers(layerList);
 
-  Sortable.create(layerList, {
+  map.currentLayersControl._sl = Sortable.create(layerList, {
     animation: 150,
     onUpdate: function(evt) {
       sortLayers(layerList);
