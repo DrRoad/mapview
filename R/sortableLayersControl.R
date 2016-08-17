@@ -16,6 +16,24 @@ sortableLayersControlDependencies <- function() {
   )
 }
 
+sortableLayersControlDependencies <- function() {
+  list(
+    htmltools::htmlDependency(
+      "Sortable",
+      '1.4.2',
+      system.file("htmlwidgets/lib/sortable_layers_control", package = "mapview"),
+      script = c("Sortable.js")
+    ),
+    htmltools::htmlDependency(
+      "sortableLayersControl",
+      '0.0.1',
+      system.file("htmlwidgets/lib/sortable_layers_control", package = "mapview"),
+      script = "sortableLayersControl2.js",
+      stylesheet = 'sortableLayersControl.css'
+    )
+  )
+}
+
 
 #
 # # ' Add full screen control to map
@@ -39,5 +57,13 @@ sortableLayersControl <- function(map, layer.names) {
 
   map$dependencies <- c(map$dependencies, sortableLayersControlDependencies())
   leaflet::invokeMethod(map, leaflet:::getMapData(map), 'sortableLayersControl')
+
+}
+
+
+sortableLayersControl2 <- function(map, layer.names) {
+
+  map$dependencies <- c(map$dependencies, sortableLayersControlDependencies())
+  leaflet::invokeMethod(map, leaflet:::getMapData(map), 'sortableLayersControl2')
 
 }
